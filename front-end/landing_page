@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>NyumbaSync MVP</title>
+</head>
+<body>
+    <h1>NyumbaSync</h1>
+
+    <h2>Properties</h2>
+    <ul id="properties-list"></ul>
+
+    <h2>Add Property</h2>
+    <form id="add-property-form">
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name"><br><br>
+        <label for="address">Address:</label>
+        <input type="text" id="address" name="address"><br><br>
+        <label for="rent">Rent:</label>
+        <input type="number" id="rent" name="rent"><br><br>
+        <button type="submit">Add Property</button>
+    </form>
+
+    <h2>Tenants</h2>
+    <ul id="tenants-list"></ul>
+
+    <h2>Add Tenant</h2>
+    <form id="add-tenant-form">
+        <label for="tenant-propertyId">Property ID:</label>
+        <input type="number" id="tenant-propertyId" name="propertyId"><br><br>
+        <label for="tenant-name">Name:</label>
+        <input type="text" id="tenant-name" name="name"><br><br>
+        <label for="tenant-contact">Contact:</label>
+        <input type="email" id="tenant-contact" name="contact"><br><br>
+        <button type="submit">Add Tenant</button>
+    </form>
+
+    <h2>Maintenace Requests</h2>
+    <ul id="maintenance-list"></ul>
+
+    <script>
+        const apiUrl = 'http://localhost:3001/api';  // Adjust if your API is on a different port/domain
+
+        // *** Function to Fetch Properties ***
+        async function fetchProperties() {
+            const response = await fetch(`${apiUrl}/properties`);
+            const properties = await response.json();
+
+            const propertiesList = document.getElementById('properties-list');
+            propertiesList.innerHTML = '';  // Clear the list
+
+            properties.forEach(property => {
+                const li = document.createElement('li');
+                li.textContent = `${property.name} - ${property.address} - Rent: ${property.rent}`;
+                propertiesList.appendChild(li);
+            });
+        }
+
+         // *** Function to Fetch maintenance requests ***
+         async function fetchMaintenance() {
+            const response = await fetch(`${apiUrl}/maintenance`);
+            const maintenanceRequests = await response.json();
+
+            const maintenanceList = document.getElementById('maintenance-list');
+            maintenanceList.innerHTML = '';  // Clear the list
+
+            maintenanceRequests.forEach(maintenanceRequest => {
+                const li = document.createElement('li');
+                li.textContent = `${maintenanceRequest.id}`;
+                maintenanceList.appendChild(li);
+            });
+        }
+
+        // *** Function to Add Property ***
+        async function addProperty(event) {
+            event.preventDefault(); // Prevent form submission
+
+            const name = document.getElementById('name').value;
+            const address = document.getElementById('address').value;
+            const rent = document.getElementById('rent').value;
+
+            const response = await fetch(`${apiUrl}/properties`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ name, address, rent })
+            });
+
+            if (response.ok) {
+                fetchProperties();  // Refresh the property list
+                document.getElementById('add-property-form').reset(); // Clear the form
+            } else {
+                alert('Error adding property');
+            }
+        }
+
+        // *** Function to Fetch Tenants ***
+        async function fetchTenants() {
+            const response = await fetch(`${apiUrl}/tenants`);
+            const tenants = await response.json();
+
+            const tenantsList = document.getElementById('tenants-list');
+            tenantsList.innerHTML = '';
+
+            tenants.forEach(tenant => {
+                const li = document.createElement('li');
+                li.textContent = `${tenant.name} - ${tenant.contact} (Property ID: ${tenant.propertyId})`;
+                tenantsList.appendChild(li);
+            });
+        }
+
+        // *** Function to Add Tenant ***
+        async function addTenant(event) {
+            event.preventDefault();
+
+            const propertyId = document.getElementById('tenant-propertyId').value;
+            const name = document.getElementById('tenant-name').value;
+            const contact = document.getElementById('tenant-contact').value;
+
+            const response = await fetch(`${apiUrl}/tenants`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ propertyId, name, contact })
+            });
+
+            if (response.ok) {
+                fetchTenants();
+                document.getElementById('add-tenant-form').reset();
+            } else {
+                alert('Error adding tenant');
+            }
+        }
+
+        // *** Event Listeners ***
+        document.getElementById('add-property-form').addEventListener('submit', addProperty);
+        document.getElementById('add-tenant-form').addEventListener('submit', addTenant);
+
+        // *** Initial Data Load ***
+        fetchProperties();
+        fetchTenants();
+        fetchMaintenance();
+    </script>
+</body>
+</html>

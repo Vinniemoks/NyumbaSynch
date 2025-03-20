@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NyumbaSync - Create Account</title>
+    <style>
+        /* ... (Same CSS as before) ... */
+    </style>
+</head>
+<body>
+
+    <h1>Create Your NyumbaSync Account</h1>
+
+    <form id="createAccountForm">
+        <!-- ... (Same form elements as before) ... -->
+    </form>
+
+    <script>
+        /* ... (Same variable declarations as before) ... */
+
+        const API_BASE_URL = 'http://localhost:3001/api'; // Replace with your actual back-end URL
+        const CREATE_ACCOUNT_ENDPOINT = `${API_BASE_URL}/register`; // Adjust if your endpoint is different
+
+        /* ... (Same phone validation logic as before) ... */
+
+        /* ... (Same house number validation logic as before) ... */
+
+        /* ... (Same updateCreateAccountButton function as before) ... */
+
+        /* ... (Same event listeners for input changes as before) ... */
+
+        // Form Submission Handling
+        form.addEventListener('submit', async function(event) {
+            event.preventDefault(); // Prevent actual form submission
+
+            if (createAccountBtn.disabled) {
+                message.textContent = "Please fill in all the details and validate before creating an account.";
+                return;
+            }
+
+            // Collect form data
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData.entries());
+
+            console.log("Form Data:", data); // Display the data
+
+            message.textContent = "Account creation in progress...";
+
+            try {
+                const response = await fetch(CREATE_ACCOUNT_ENDPOINT, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                        //Add authorization header here if needed
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const responseData = await response.json();
+
+                if (response.ok) {
+                    message.textContent = "Account created successfully!";
+                    form.reset();
+                    isPhoneValidated = false;
+                    isHouseValidated = false;
+                    createAccountBtn.disabled = true;
+
+                    // Optionally redirect the user after successful account creation
+                    // window.location.href = "/login";
+                } else {
+                    // Handle API errors
+                    console.error("API Error:", responseData);
+                    message.textContent = `Account creation failed: ${responseData.message || 'Unknown error'}`;
+                }
+            } catch (error) {
+                console.error("Fetch Error:", error);
+                message.textContent = "An error occurred during account creation. Please try again.";
+            }
+        });
+    </script>
+
+</body>
+</html>

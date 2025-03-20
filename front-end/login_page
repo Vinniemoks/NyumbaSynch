@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NyumbaSync - Create Account</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        input[type="text"],
+        input[type="email"],
+        input[type="number"] {
+            width: 250px;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        #message {
+            color: red;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Create Your NyumbaSync Account</h1>
+
+    <form id="createAccountForm">
+
+        <div class="form-group">
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" required>
+        </div>
+
+        <div class="form-group">
+            <label for="phone">Phone Number:</label>
+            <input type="number" id="phone" name="phone" required>
+            <button type="button" id="validatePhoneBtn">Validate Phone</button>
+            <span id="phoneValidationMessage"></span>
+        </div>
+
+        <div class="form-group">
+            <label for="email">Email Address:</label>
+            <input type="email" id="email" name="email" required>
+        </div>
+
+        <div class="form-group">
+            <label for="apartment">Apartment Number:</label>
+            <input type="number" id="apartment" name="apartment" required>
+            <span id="apartmentValidationMessage"></span>
+        </div>
+
+        <div class="form-group">
+            <label for="house">House Number:</label>
+            <input type="text" id="house" name="house" required>
+            <span id="houseValidationMessage"></span>
+        </div>
+
+        <div class="form-group">
+            <label for="rent">Base Rent:</label>
+            <input type="number" id="rent" name="rent" required>
+        </div>
+
+        <div class="form-group">
+            <label for="serviceCharge">Service Charge:</label>
+            <input type="number" id="serviceCharge" name="serviceCharge" required>
+        </div>
+
+        <div class="form-group">
+            <label for="waterBill">Water Bill:</label>
+            <input type="number" id="waterBill" name="waterBill" required>
+        </div>
+
+        <button type="submit" id="createAccountBtn" disabled>Create Account</button>
+        <p id="message"></p>
+
+    </form>
+
+    <script>
+        const form = document.getElementById('createAccountForm');
+        const phoneInput = document.getElementById('phone');
+        const validatePhoneBtn = document.getElementById('validatePhoneBtn');
+        const phoneValidationMessage = document.getElementById('phoneValidationMessage');
+        const apartmentInput = document.getElementById('apartment');
+        const apartmentValidationMessage = document.getElementById('apartmentValidationMessage');
+        const houseInput = document.getElementById('house');
+        const houseValidationMessage = document.getElementById('houseValidationMessage');
+        const rentInput = document.getElementById('rent');
+        const serviceChargeInput = document.getElementById('serviceCharge');
+        const waterBillInput = document.getElementById('waterBill');
+        const createAccountBtn = document.getElementById('createAccountBtn');
+        const message = document.getElementById('message');
+
+        let isPhoneValidated = false;
+        let isHouseValidated = false;
+
+        // Phone Validation
+        validatePhoneBtn.addEventListener('click', function() {
+            const phone = phoneInput.value;
+
+            //Basic Regex to validate a Kenyan Phone number (+2547########)
+            if(!/^(\+254)?[7]\d{8}$/.test(phone)){
+                phoneValidationMessage.textContent = "Invalid phone number format. Please use +2547********.";
+                isPhoneValidated = false;
+                updateCreateAccountButton();
+                return;
+            }
+
+             // Here, in a real app, you would make an API call to validate the phone number.
+            // Simulating a successful validation
+            setTimeout(() => {
+                phoneValidationMessage.textContent = "Phone number validated!";
+                isPhoneValidated = true;
+                updateCreateAccountButton();
+            }, 500); // Simulate a 0.5 second API call
+        });
+
+        // House Number Validation
+        houseInput.addEventListener('input', function() {
+            if (houseInput.value.trim() === "") {
+                houseValidationMessage.textContent = "House number cannot be empty.";
+                isHouseValidated = false;
+            } else {
+                houseValidationMessage.textContent = "";
+                isHouseValidated = true;
+            }
+            updateCreateAccountButton();
+        });
+
+        // Function to Validate apartment Number
+        apartmentInput.addEventListener('input', function() {
+            if (apartmentInput.value === "") {
+                apartmentValidationMessage.textContent = "Apartment number cannot be empty.";
+            } else {
+                apartmentValidationMessage.textContent = "";
+            }
+        });
+
+        // Function to enable or disable the create account button
+        function updateCreateAccountButton() {
+            const isRentValid = rentInput.value !== "";
+            const isServiceChargeValid = serviceChargeInput.value !== "";
+            const isWaterBillValid = waterBillInput.value !== "";
+
+            if (isPhoneValidated && isHouseValidated && isRentValid && isServiceChargeValid && isWaterBillValid) {
+                createAccountBtn.disabled = false;
+            } else {
+                createAccountBtn.disabled = true;
+            }
+        }
+
+        // Update button status on rent, service charge, and water bill input changes
+        rentInput.addEventListener('input', updateCreateAccountButton);
+        serviceChargeInput.addEventListener('input', updateCreateAccountButton);
+        waterBillInput.addEventListener('input', updateCreateAccountButton);
+
+        // Form Submission Handling
+        form.addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent actual form submission
+
+            if (createAccountBtn.disabled) {
+                message.textContent = "Please fill in all the details and validate before creating an account.";
+                return;
+            }
+
+            // In a real app, you would now submit the form data to your server
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData.entries());
+
+            console.log("Form Data:", data); // Display the data
+
+            message.textContent = "Account creation in progress...";
+
+            //Simulating Account Creation
+            setTimeout(() => {
+                message.textContent = "Account created successfully!";
+                form.reset();
+                isPhoneValidated = false;
+                isHouseValidated = false;
+                createAccountBtn.disabled = true;
+            }, 1500);
+        });
+    </script>
+
+</body>
+</html>
